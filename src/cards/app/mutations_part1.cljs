@@ -10,6 +10,10 @@
   (action [{:keys [state]}]
     (swap! state assoc :item/label text)))
 
+(defmutation toggle-complete [{:keys [_]}]
+  (action [{:keys [state]}]
+    (swap! state update :item/complete? not)))
+
 (defsc TodoItem [this {:keys [db/id
                               item/label
                               item/complete?
@@ -20,6 +24,7 @@
                    :ui/editing? true}}
        (dom/li nil
          (dom/input #js {:type     "checkbox"
+                         :onClick (fn [evt] (prim/transact! this `[(toggle-complete {})]))
                          :checked  complete?})
          (if editing?
            (dom/input #js {:type "text"
