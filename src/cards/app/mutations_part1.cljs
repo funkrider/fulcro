@@ -2,8 +2,13 @@
      (:require [devcards.core :as rc :refer-macros [defcard]]
                [fulcro.client.cards :refer [defcard-fulcro]]
                [fulcro.client.dom :as dom]
+               [fulcro.client.mutations :refer [defmutation]]
                [fulcro.client.primitives :as prim :refer [defsc]]
                [app.ui.components :as comp]))
+
+(defmutation change-item-label [{:keys [text]}]
+  (action [{:keys [state]}]
+    (swap! state assoc :item/label text)))
 
 (defsc TodoItem [this {:keys [db/id
                               item/label
@@ -14,10 +19,11 @@
                    :item/complete? false
                    :ui/editing? true}}
        (dom/li nil
-         (dom/input #js {:type "checkbox"
-                         :checked complete?})
+         (dom/input #js {:type     "checkbox"
+                         :checked  complete?})
          (if editing?
            (dom/input #js {:type "text"
+                           :onChange (fn [evt] (prim/transact! this `[(change-item-label {:text ~(.. evt -target -value)})]))
                            :value label})
            label)))
 
