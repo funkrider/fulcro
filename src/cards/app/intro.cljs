@@ -6,6 +6,7 @@
             [app.ui.components :as comp]))
 
 (defsc Root [this {:keys [name] :as props}]
+  {:initial-state {:name "Ianx"}}
   (js/console.log props)
   (dom/div nil
     (str "hi " name)))
