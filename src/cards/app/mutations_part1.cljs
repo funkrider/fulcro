@@ -4,6 +4,7 @@
                [fulcro.client.dom :as dom]
                [fulcro.client.mutations :refer [defmutation]]
                [fulcro.client.primitives :as prim :refer [defsc]]
+               [fulcro.events :refer [enter-key?]]
                [app.ui.components :as comp]))
 
 (defmutation change-item-label [{:keys [text]}]
@@ -13,6 +14,10 @@
 (defmutation toggle-complete [{:keys [_]}]
   (action [{:keys [state]}]
     (swap! state update :item/complete? not)))
+
+(defmutation finish-editing [{:keys [_]}]
+  (action [{:keys [state]}]
+    (swap! state assoc :ui/editing? false)))
 
 (defsc TodoItem [this {:keys [db/id
                               item/label
@@ -27,9 +32,12 @@
                          :onClick (fn [evt] (prim/transact! this `[(toggle-complete {})]))
                          :checked  complete?})
          (if editing?
-           (dom/input #js {:type "text"
-                           :onChange (fn [evt] (prim/transact! this `[(change-item-label {:text ~(.. evt -target -value)})]))
-                           :value label})
+           (dom/input #js {:type      "text"
+                           :onChange  (fn [evt] (prim/transact! this `[(change-item-label {:text ~(.. evt -target -value)})]))
+                           :onKeyDown (fn [evt]
+                                        (if (enter-key? evt)
+                                          (prim/transact! this `[(finish-editing {})])))
+                           :value     label})
            label)))
 
 (defcard-fulcro active-todo-item-1
