@@ -8,7 +8,6 @@
             [app.ui.components :as comp]))
 
 
-
 (defmutation change-item-label [{:keys [text]}]
   (action [{:keys [state]}]
     (swap! state assoc :item/label text)))
@@ -27,10 +26,11 @@
                               item/label
                               item/complete?
                               ui/editing?] :as props}]
-  {:initial-state {:db/id 1
-                   :item/label "Buy stuff"
-                   :item/complete? false
-                   :ui/editing? true}}
+  {:initial-state (fn [{:keys [id label]}]
+                    {:db/id          id
+                     :item/label     label
+                     :item/complete? false
+                     :ui/editing?    false})}
   (dom/li nil
     (dom/input #js {:type     "checkbox"
                     :onClick (fn [evt] (prim/transact! this `[(toggle-complete {})]))
@@ -55,7 +55,8 @@
                                   (prim/get-initial-state TodoItem
                                     {:id 3 :label "C"})]})}
   (dom/div #js {:key react-key}
-    "TODO List..."))
+    "TODO List..."
+    (mapv ui-todo-item items)))
 
 (defcard-fulcro queries-and-itents-1
   Root
