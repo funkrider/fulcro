@@ -26,7 +26,12 @@
                               item/label
                               item/complete?
                               ui/editing?] :as props}]
-  {:initial-state (fn [{:keys [id label]}]
+  {:query [:db/id
+           :item/label
+           :item/complete?
+           :ui/editing?]
+   :ident [:todo-item/by-id :db/id]
+   :initial-state (fn [{:keys [id label]}]
                     {:db/id          id
                      :item/label     label
                      :item/complete? false
@@ -47,9 +52,12 @@
 (def ui-todo-item (prim/factory TodoItem))
 
 (defsc TodoList [this {:keys [db/id list/name list/items]}]
-  {:initial-state (fn [{:keys [id name]}]
-                    {:db/id     id
-                     :list/name name
+  {:query         [:db/id :list/name
+                   {:list/items (prim/get-query TodoItem)}]
+   :ident         [:todo-list/by-id :db/id]
+   :initial-state (fn [{:keys [id name]}]
+                    {:db/id      id
+                     :list/name  name
                      :list/items [(prim/get-initial-state TodoItem
                                     {:id 1 :label "A"})
                                   (prim/get-initial-state TodoItem
@@ -63,7 +71,9 @@
 (def ui-todo-list (prim/factory TodoList))
 
 (defsc Root [this {:keys [ui/react-key root/todo-list]}]
-  {:initial-state (fn [params]
+  {:query         [:ui/react-key
+                   {:root/todo-list (prim/get-query TodoList)}]
+   :initial-state (fn [params]
                     {:root/todo-list (prim/get-initial-state TodoList
                                        {:id 1 :name "My List"})})}
   (dom/div #js {:key react-key}
