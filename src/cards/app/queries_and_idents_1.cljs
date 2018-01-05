@@ -49,7 +49,7 @@
                       :value     label})
       label)))
 
-(def ui-todo-item (prim/factory TodoItem))
+(def ui-todo-item (prim/factory TodoItem {:keyfn :db/id}))
 
 (defsc TodoList [this {:keys [db/id list/name list/items]}]
   {:query         [:db/id :list/name
