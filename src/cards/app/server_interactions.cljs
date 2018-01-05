@@ -5,7 +5,8 @@
             [fulcro.client.mutations :as m :refer [defmutation]]
             [fulcro.client.primitives :as prim :refer [defsc]]
             [fulcro.events :refer [enter-key?]]
-            [app.ui.components :as comp]))
+            [app.ui.components :as comp]
+            [fulcro.client.data-fetch :as df]))
 
 (defn item-ident [id] [:todo-item/by-id id])
 (defn item-path [id field] [:todo-item/by-id id field])
@@ -88,4 +89,7 @@
 (defcard-fulcro queries-and-idents-1
   Root
   {} ;; empty initial db
-  {:inspect-data true})
+  {:inspect-data true
+   :fulcro       {:started-callback (fn [app]
+                                      (df/load app :todo-list TodoList {:marker false})
+                                      (js/console.log :STARTED))}})
