@@ -8,9 +8,9 @@
             [app.ui.components :as comp]))
 
 
-(defmutation change-item-label [{:keys [text]}]
+(defmutation change-item-label [{:keys [id text]}]
   (action [{:keys [state]}]
-    (swap! state assoc :item/label text)))
+    (swap! state assoc-in [:todo-item/by-id id :item/label] text)))
 
 (defmutation toggle-complete [{:keys [_]}]
   (action [{:keys [state]}]
@@ -35,14 +35,14 @@
                     {:db/id          id
                      :item/label     label
                      :item/complete? false
-                     :ui/editing?    false})}
+                     :ui/editing?    true})}
   (dom/li nil
     (dom/input #js {:type     "checkbox"
                     :onClick (fn [evt] (prim/transact! this `[(toggle-complete {})]))
                     :checked  complete?})
     (if editing?
       (dom/input #js {:type      "text"
-                      :onChange  (fn [evt] (prim/transact! this `[(change-item-label {:text ~(.. evt -target -value)})]))
+                      :onChange  (fn [evt] (prim/transact! this `[(change-item-label {:id ~id :text ~(.. evt -target -value)})]))
                       :onKeyDown (fn [evt]
                                    (if (enter-key? evt)
                                      (prim/transact! this `[(finish-editing {})])))
