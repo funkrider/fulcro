@@ -2,7 +2,7 @@
   (:require [devcards.core :as rc :refer-macros [defcard]]
             [fulcro.client.cards :refer [defcard-fulcro]]
             [fulcro.client.dom :as dom]
-            [fulcro.client.mutations :refer [defmutation]]
+            [fulcro.client.mutations :as m :refer [defmutation]]
             [fulcro.client.primitives :as prim :refer [defsc]]
             [fulcro.events :refer [enter-key?]]
             [app.ui.components :as comp]))
@@ -49,9 +49,9 @@
                       :onChange  (fn [evt] (prim/transact! this `[(change-item-label {:id ~id :text ~(.. evt -target -value)})]))
                       :onKeyDown (fn [evt]
                                    (if (enter-key? evt)
-                                     (prim/transact! this `[(finish-editing {:id ~id})])))
+                                     (m/toggle! this :ui/editing?)))
                       :value     label})
-      label)))
+      (dom/a #js {:onDoubleClick (fn [evt] (m/toggle! this :ui/editing?))} label))))
 
 (def ui-todo-item (prim/factory TodoItem {:keyfn :db/id}))
 
