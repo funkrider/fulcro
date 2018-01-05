@@ -7,10 +7,14 @@
             [fulcro.events :refer [enter-key?]]
             [app.ui.components :as comp]))
 
+(defn item-ident [id] [:todo-item/by-id id])
+(defn item-path [id field] [:todo-item/by-id id field])
+(defn change-item-label* [state id text]
+  (assoc-in state (item-path id :item/label) text))
 
 (defmutation change-item-label [{:keys [id text]}]
   (action [{:keys [state]}]
-    (swap! state assoc-in [:todo-item/by-id id :item/label] text)))
+    (swap! state change-item-label* id text)))
 
 (defmutation toggle-complete [{:keys [_]}]
   (action [{:keys [state]}]
