@@ -46,19 +46,31 @@
 
 (def ui-todo-item (prim/factory TodoItem))
 
-(defsc Root [this {:keys [ui/react-key todo/items]}]
-  {:initial-state (fn [params]
-                    {:todo/items [(prim/get-initial-state TodoItem
+(defsc TodoList [this {:keys [db/id list/name list/items]}]
+  {:initial-state (fn [{:keys [id name]}]
+                    {:db/id     id
+                     :list/name name
+                     :list/items [(prim/get-initial-state TodoItem
                                     {:id 1 :label "A"})
                                   (prim/get-initial-state TodoItem
                                     {:id 2 :label "B"})
                                   (prim/get-initial-state TodoItem
                                     {:id 3 :label "C"})]})}
-  (dom/div #js {:key react-key}
-    "TODO List..."
+  (dom/div nil
+    (dom/h4 nil name)
     (mapv ui-todo-item items)))
 
-(defcard-fulcro queries-and-itents-1
+(def ui-todo-list (prim/factory TodoList))
+
+(defsc Root [this {:keys [ui/react-key root/todo-list]}]
+  {:initial-state (fn [params]
+                    {:root/todo-list (prim/get-initial-state TodoList
+                                       {:id 1 :name "My List"})})}
+  (dom/div #js {:key react-key}
+    "TODO List..."
+    (ui-todo-list todo-list)))
+
+(defcard-fulcro queries-and-idents-1
   Root
   {} ;; empty initial db
   {:inspect-data true})
