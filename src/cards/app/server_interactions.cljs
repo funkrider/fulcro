@@ -35,12 +35,7 @@
            :item/label
            :item/complete?
            :ui/editing?]
-   :ident [:todo-item/by-id :db/id]
-   :initial-state (fn [{:keys [id label]}]
-                    {:db/id          id
-                     :item/label     label
-                     :item/complete? false
-                     :ui/editing?    true})}
+   :ident [:todo-item/by-id :db/id]}
 
   (dom/li nil
     (dom/input #js {:type     "checkbox"
@@ -60,16 +55,7 @@
 (defsc TodoList [this {:keys [db/id list/name list/items]}]
   {:query         [:db/id :list/name
                    {:list/items (prim/get-query TodoItem)}]
-   :ident         [:todo-list/by-id :db/id]
-   :initial-state (fn [{:keys [id name]}]
-                    {:db/id      id
-                     :list/name  name
-                     :list/items [(prim/get-initial-state TodoItem
-                                    {:id 1 :label "A"})
-                                  (prim/get-initial-state TodoItem
-                                    {:id 2 :label "B"})
-                                  (prim/get-initial-state TodoItem
-                                    {:id 3 :label "C"})]})}
+   :ident         [:todo-list/by-id :db/id]}
   (dom/div nil
     (dom/h4 nil name)
     (mapv ui-todo-item items)))
@@ -78,10 +64,7 @@
 
 (defsc Root [this {:keys [ui/react-key root/todo-list]}]
   {:query         [:ui/react-key
-                   {:root/todo-list (prim/get-query TodoList)}]
-   :initial-state (fn [params]
-                    {:root/todo-list (prim/get-initial-state TodoList
-                                       {:id 1 :name "My List"})})}
+                   {:root/todo-list (prim/get-query TodoList)}]}
   (dom/div #js {:key react-key}
     "TODO List..."
     (ui-todo-list todo-list)))
@@ -91,5 +74,7 @@
   {} ;; empty initial db
   {:inspect-data true
    :fulcro       {:started-callback (fn [app]
-                                      (df/load app :todo-list TodoList {:marker false})
+                                      (df/load app :todo-list TodoList
+                                        {:marker false
+                                         :target [:root/todo-list]})
                                       (js/console.log :STARTED))}})
