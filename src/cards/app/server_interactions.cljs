@@ -15,7 +15,8 @@
 
 (defmutation change-item-label [{:keys [id text]}]
   (action [{:keys [state]}]
-    (swap! state change-item-label* id text)))
+    (swap! state change-item-label* id text))
+  (remote [env] true))
 
 (defmutation toggle-complete [{:keys [id]}]
   (action [{:keys [state]}]
